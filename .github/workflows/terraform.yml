@@ -1,42 +1,44 @@
-name: Deploy Azure Resource Group with Terraform
+name: Deploy Azure Resource Group
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   terraform:
+    name: Terraform Apply
     runs-on: ubuntu-latest
 
-    environment:
-      name: 'Production'  # You can change this to your preferred environment name.
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.5.0  # Use the desired version of Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
 
-    - name: Configure Azure credentials
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Initialize Terraform
-      run: terraform init
+      - name: Initialize Terraform
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform init
 
-    - name: Validate Terraform configuration
-      run: terraform validate
+      - name: Validate Terraform
+        run: terraform validate
 
-    - name: Plan Terraform deployment
-      run: terraform plan -var-file=terraform.tfvars
+      - name: Plan Terraform
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform plan -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
 
-    - name: Apply Terraform deployment
-      run: terraform apply -auto-approve -var-file=terraform.tfvars
-
-    - name: Output Terraform version
-      run: terraform version
+      - name: Apply Terraform
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
