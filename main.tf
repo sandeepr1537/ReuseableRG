@@ -1,6 +1,7 @@
 provider "azurerm" {
   features {}
 
+  # Dynamically pass the subscription ID from the variable
   subscription_id = var.subscription_id
 }
 
