@@ -12,33 +12,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
 
+      # Step 3: Log in to Azure
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Step 4: Terraform Init
       - name: Initialize Terraform
         env:
-          ARM_SUBSCRIPTION_ID: ${{ secrets.subscriptionId }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         run: terraform init
 
+      # Step 5: Terraform Validate
       - name: Validate Terraform
         run: terraform validate
 
+      # Step 6: Terraform Plan
       - name: Plan Terraform
         env:
-          ARM_SUBSCRIPTION_ID: ${{ secrets.subscriptionId }}
-        run: terraform plan -var "subscription_id=${{ secrets.subscriptionId }}" -var-file="terraform.tfvars"
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform plan -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
 
+      # Step 7: Terraform Apply
       - name: Apply Terraform
         env:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.subscriptionId }}" -var-file="terraform.tfvars"
+        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
