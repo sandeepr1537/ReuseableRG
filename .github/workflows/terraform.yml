@@ -27,7 +27,7 @@ jobs:
 
       - name: Initialize Terraform
         env:
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.subscriptionId }}
         run: terraform init
 
       - name: Validate Terraform
@@ -35,10 +35,10 @@ jobs:
 
       - name: Plan Terraform
         env:
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        run: terraform plan -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
+          ARM_SUBSCRIPTION_ID: ${{ secrets.subscriptionId }}
+        run: terraform plan -var "subscription_id=${{ secrets.subscriptionId }}" -var-file="terraform.tfvars"
 
       - name: Apply Terraform
         env:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var-file="terraform.tfvars"
+        run: terraform apply -auto-approve -var "subscription_id=${{ secrets.subscriptionId }}" -var-file="terraform.tfvars"
